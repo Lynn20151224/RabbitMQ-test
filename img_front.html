@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上傳關鍵字測試</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .pic {
+            margin: 10% auto;
+            padding: 10px;
+            width: 500px;
+            height: 200px;
+            border: 1px solid purple;
+        }
+
+        .pic_form {
+            margin: auto;
+            text-align: center;
+            background-color: rgb(163, 163, 255);
+        }
+        .pic_math {
+            margin: 10px auto;
+            height: 35%;
+            background: rgb(255, 204, 204);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hello-Bootstrap</h1>
+    <div class="pic">
+        <div class="pic_form">
+            <form id="uploadForm" action="img_upload.php" method="post" enctype="multipart/form-data">
+                <span>選擇圖片：</span><input type="file" name="images[]" multiple>
+                <button type="submit" class="btn btn-warning m-3">上傳圖片</button>
+            </form>
+        </div>
+        <div class="pic_math">
+            <span>狀態:</span>
+            <div id="progressInfo"></div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#uploadForm').submit(function (e) {
+                e.preventDefault(); // 防止表單的默認提交行為
+
+                var formData = new FormData(this); // 創建FormData對象
+
+                $.ajax({
+                    url: 'img_upload.php', // 處理上傳的後端腳本
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // 告訴jQuery不要處理發送的數據
+                    contentType: false, // 告訴jQuery不要設置內容類型頭部信息
+                    xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                $('#progressInfo').html('上傳進度: ' + Math.round(percentComplete * 100) + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        // 上傳成功後的回傳資料
+                        if (response.error) {
+                            $('#progressInfo').html('錯誤：' + response.message);
+                        } else {
+                            $('#progressInfo').html('上傳完成。檔案數量：' + response.data.imageCount);
+                            console.log("data->",response.data);
+                        }
+                    },
+                    error: function () {
+                        // 處理錯誤情況
+                        $('#progressInfo').html('上傳發生錯誤');
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+
+</html>
