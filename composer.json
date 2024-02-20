@@ -1,6 +1,5 @@
 {
     "require": {
-        "php-amqplib/php-amqplib": "2.6.1",
-        "phpoffice/phpspreadsheet": "^2.0"
+        "php-amqplib/php-amqplib": "2.6.1"
     }
 }

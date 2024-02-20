@@ -4,8 +4,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-header('Content-Type: application/json'); // 設置返回類型為JSON
-
+header('Content-Type: application/json'); // 設置返回JSON
+session_start();
 // DB連接
 $dbHost = '192.168.2.128';
 $dbName = 'keywords_test_server';
@@ -15,10 +15,20 @@ $dbPass = 'imagedj';
 // 建力PDO
 $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
 
-// 假設所有圖片都上傳到這個資料夾
-$targetDir = "uploads/";
-if (!file_exists($targetDir)) {
-    mkdir($targetDir, 0777, true);
+
+$targetDir = "uploads/";// 假設所有圖片都上傳到這個資料夾
+$userId = $_SESSION['user_id']; // 這裡使用登入的的userId
+$userDir = $targetDir .  '/'. $userId . '/'; // 建立userId的資料夾
+
+if (!file_exists($userDir)) {
+    mkdir($userDir, 0777, true);
+}
+
+
+// 檢柴user_id資料夾裡的資料夾B
+$backupDir = $userDir . 'B/';
+if (!file_exists($backupDir)) {
+    mkdir($backupDir, 0777, true);
 }
 
 // 生成唯一的requestId
@@ -28,14 +38,24 @@ $fileNames = [];
 $imageCount = count($_FILES['images']['name']);
 
 
+
 try {
     // 處理每一個上傳的檔案
     for ($i = 0; $i < $imageCount; $i++) {
         $fileName = $_FILES["images"]["name"][$i];
-        $targetFilePath = $targetDir . basename($fileName);
+        $targetFilePath = $userDir . basename($fileName);
+        $backupFilePath = $backupDir . basename($fileName);
+
+        // 移圖片到user_id資料夾
         if (!move_uploaded_file($_FILES["images"]["tmp_name"][$i], $targetFilePath)) {
-            throw new Exception('文件上傳失敗');
+            throw new Exception('圖片上傳失败');
         }
+
+        // 移圖片到資料夾B
+        if (!copy($targetFilePath, $backupFilePath)) {
+            throw new Exception('圖片複製到資料夾B失败');
+        }
+
         $fileNames[] = $fileName;
     }
 
@@ -45,7 +65,6 @@ try {
     // 開始
     $pdo->beginTransaction();
 
-    $userId = "1"; // 這裡使用實際的userId
 
     // 插入一條新的請求記錄到requests表中，包括JSON格式的檔案名稱
     $stmt = $pdo->prepare("INSERT INTO requests (userId, imageCount, filePath, fileName) VALUES (?, ?, ?, ?)");
@@ -62,6 +81,7 @@ try {
         "imageCount" => $imageCount,
         "filePath" => $targetDir,
         "fileName" => $fileNames,
+        // "session" => $_SESSION['user_id']
     ];
 
     // 轉JSON

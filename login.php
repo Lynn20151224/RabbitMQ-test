@@ -24,13 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['username']) && !empty
     if ($user && password_verify($provided_password, $user['password_hash'])) {
         // 密碼正確
         $_SESSION['user_id'] = $user['userId'];
-        echo '登入成功';
+        // print_r($_SESSION)."</br>";
+        // echo '登入成功';return;
         header('Location: img_front.html');
         exit;
     } else {
         echo '登入失敗，用戶名或密碼不正確';
     }
 } else {
+    // echo '失敗';return;
     header('Location: login.html');
     exit;
 }
