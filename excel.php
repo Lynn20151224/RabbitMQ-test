@@ -5,7 +5,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 $inputFileName = 'path/to/your/excel/file.xlsx';
 
-// 嘗試讀取檔案
+// 讀取檔案
 $spreadsheet = IOFactory::load($inputFileName);
 $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
@@ -30,13 +30,13 @@ try {
 }
 
 
-// 假設您的 Excel 檔案中有 A、B 和 C 三列需要插入到資料庫
+// Excel有 A、B 和 C 三列要插資料庫
 $query = "INSERT INTO your_table_name (column1, column2, column3) VALUES (?, ?, ?)";
 
 $stmt = $pdo->prepare($query);
 
 foreach ($sheetData as $row) {
-    // 跳過標題行，如果有的話
+    // 跳過標題行，如果有的話啦
     if ($row['A'] == 'TitleOfColumnA') {
         continue;
     }

@@ -88,7 +88,7 @@ try {
     $jsonData = json_encode($data);
 
     // 發送到RabbitMQ...
-    $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+    $connection = new AMQPStreamConnection('localhost', 5672, 'imagedj', 'imagedj89684152');
     $channel = $connection->channel();
     $channel->queue_declare('json_queue', false, false, false, false);
     $msg = new AMQPMessage($jsonData);

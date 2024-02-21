@@ -3,16 +3,16 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-// 設置 RabbitMQ 的連接
-$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+// RabbitMQ 連接
+$connection = new AMQPStreamConnection('localhost', 5672, 'imagedj', 'imagedj89684152');
 $channel = $connection->channel();
 
-// 定義隊列名稱
+// 定義名稱
 $queueName = 'tesk_queue';
 
 $channel->queue_declare($queueName, false, true, false, false);
 
-echo " [*] 等待消息。要退出請按 CTRL+C\n";
+echo " [*] 等消息。要退出按 CTRL+C\n";
 
 $callback = function ($msg) {
     echo " [x] 收到 ", $msg->body, "\n";
